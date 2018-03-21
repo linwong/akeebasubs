@@ -52,11 +52,12 @@ use FOF30\Utils\FEFHelper\Html as FEFHtml;
     @yield('edit-form-body')
     {{-- Hidden form fields --}}
     <div class="akeeba-hidden-fields-container">
-        @section('browse-default-hidden-fields')
+        @section('edit-default-hidden-fields')
             <input type="hidden" name="option" id="option" value="{{{ $this->getContainer()->componentName }}}"/>
             <input type="hidden" name="view" id="view" value="{{{ $this->getName() }}}"/>
             <input type="hidden" name="task" id="task" value="{{{ $this->getTask() }}}"/>
             <input type="hidden" name="@token()" value="1"/>
+            <input type="hidden" name="{{{ $this->getItem()->getIdFieldName() }}}" value="{{{ $this->getItem()->getId() }}}" />
         @show
         @yield('edit-hidden-fields')
     </div>

@@ -105,10 +105,10 @@ if ($showLink)
 
 	foreach ($replacements as $key => $value)
 	{
-		$link_url = str_replace($key, $value, $linkURL);
+		$linkURL = str_replace($key, $value, $linkURL);
 	}
 
-	$link_url = BrowseView::parseFieldTags($link_url, $item);
+	$linkURL = BrowseView::parseFieldTags($linkURL, $item);
 }
 
 // Get the avatar image, if necessary

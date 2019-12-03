@@ -12,10 +12,6 @@ defined('_JEXEC') or die;
 		Akeeba Subscriptions {{{ AKEEBASUBS_VERSION }}}
 	</strong>
 
-	<a href="index.php?option=com_akeebasubs&view=Updates&task=force" class="akeeba-btn--dark--small">
-        @lang('COM_AKEEBASUBS_CPANEL_MSG_RELOADUPDATE')
-	</a>
-
 	<br/>
 	<span style="font-size: x-small">
 		Copyright &copy;2010&ndash;{{{ $this->getContainer()->platform->getDate(AKEEBASUBS_DATE)->format('Y') }}}

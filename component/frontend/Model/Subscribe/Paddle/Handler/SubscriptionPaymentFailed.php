@@ -8,15 +8,11 @@
 namespace Akeeba\Subscriptions\Site\Model\Subscribe\Paddle\Handler;
 
 
-use Akeeba\Subscriptions\Admin\Helper\Message;
-use Akeeba\Subscriptions\Admin\Helper\UserLogin;
 use Akeeba\Subscriptions\Site\Model\Subscribe\HandlerTraits\StackCallback;
 use Akeeba\Subscriptions\Site\Model\Subscribe\SubscriptionCallbackHandlerInterface;
 use Akeeba\Subscriptions\Site\Model\Subscriptions;
 use FOF30\Container\Container;
 use FOF30\Date\Date;
-use FOF30\View\Exception\AccessForbidden;
-use Joomla\CMS\HTML\HTMLHelper;
 
 /**
  * Handle a subscription's recurring payment failure
@@ -48,6 +44,7 @@ class SubscriptionPaymentFailed implements SubscriptionCallbackHandlerInterface
 	{
 		$this->container = $container;
 	}
+
 	/**
 	 * Handle a webhook callback from the payment service provider about a specific subscription
 	 *
@@ -58,9 +55,9 @@ class SubscriptionPaymentFailed implements SubscriptionCallbackHandlerInterface
 	 *
 	 * @throws  \RuntimeException  In case an error occurs. The exception code will be used as the HTTP status.
 	 *
+	 * @throws \Exception
 	 * @since  7.0.0
 	 *
-	 * @throws \Exception
 	 */
 	public function handleCallback(Subscriptions $subscription, array $requestData): ?string
 	{
@@ -89,18 +86,31 @@ class SubscriptionPaymentFailed implements SubscriptionCallbackHandlerInterface
 
 		if ($hardFailure)
 		{
-			$updates['publish_down'] = gmdate('Y-m-d H:i:s');
-			$updates['state'] = 'X';
+			// In case of hard failure we set the flag to 0 to allow an expiration email to be sent.
+			$updates['contact_flag'] = 0;
+
+			/**
+			 * Also, mark this subscription as NOT recurring. Why? If the client tries to resubscribe we must not block
+			 * them from purchasing an one-off renewal or resubscribing to a recurring subscription on the same level.
+			 */
+			$updates['cancel_url'] = '';
+			$updates['update_url'] = '';
+
+			// Mark subscription expired with reason "past_due".
+			$updates['publish_down']        = gmdate('Y-m-d H:i:s');
+			$updates['state']               = 'X';
 			$updates['cancellation_reason'] = 'past_due';
 		}
-		elseif($setPending)
+		elseif ($setPending)
 		{
-			$updates['state'] = 'P';
+			// Set to pending status (soft failure, Paddle will retry charging the client).
+			$updates['state']               = 'P';
 			$updates['cancellation_reason'] = 'past_due';
 			$subscription->_noemail(true);
 		}
 		else
 		{
+			// Silent extend on soft failure (extends the subscription until Paddle retries charging the client).
 			$updates['publish_down'] = $jDate->format('Y-m-d H:i:s');
 			$subscription->_noemail(true);
 		}

@@ -172,7 +172,7 @@ $paymentMethodOptions = [
                 </a>
             </td>
             <td>
-                @include('admin:com_akeebasubs/Common/ShowUser', ['item' => $row, 'field' => 'user_id', 'linkURL' => 'index.php?option=com_akeebasubs&view=Users&task=edit&user_id=[ITEM:USER_ID]'])
+                @include('admin:com_akeebasubs/Common/ShowUser', ['item' => $row, 'field' => 'user_id', 'linkURL' => 'index.php?option=com_users&task=user.edit&id=[ITEM:USER_ID]'])
             </td>
             <td>
                 @include('admin:com_akeebasubs/Common/ShowPaymentStatus', ['item' => $row, 'field' => 'state'])

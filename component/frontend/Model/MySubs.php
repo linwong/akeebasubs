@@ -180,6 +180,8 @@ class MySubs extends Model
 					case 'canceled':
 						return 1000;
 				}
+			})->filter(function (array $levelInfo) {
+				return !$levelInfo['transactions']->isEmpty();
 			});
 	}
 

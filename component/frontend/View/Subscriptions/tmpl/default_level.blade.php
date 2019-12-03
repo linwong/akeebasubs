@@ -28,14 +28,33 @@ $relatedSub = $levelInfo['related']['related_sub'];
 /** @var \FOF30\Model\DataModel\Collection $allSubs */
 $allSubs = $levelInfo['transactions'];
 
+if ($allSubs->isEmpty())
+{
+    return;
+}
+
+$lastFortniteTimestamp = (new \FOF30\Date\Date())->sub(new DateInterval('P2W'))->getTimestamp();
+
 /** @var Subscriptions|null $unpaidSub */
 $unpaidSub = (clone $allSubs)->filter(function (Subscriptions $sub) {
 	return $sub->status == 'new';
+})->filter(function (Subscriptions $sub) use ($lastFortniteTimestamp) {
+	try {
+		return (new FOF30\Date\Date($sub->created_on))->getTimestamp() >= $lastFortniteTimestamp;
+    } catch (Exception $e) {
+		return false;
+    }
 })->first();
 
 /** @var Subscriptions|null $pendingSub */
 $pendingSub = (clone $allSubs)->filter(function (Subscriptions $sub) {
 	return $sub->status == 'pending';
+})->filter(function (Subscriptions $sub) use ($lastFortniteTimestamp) {
+	try {
+		return (new FOF30\Date\Date($sub->created_on))->getTimestamp() >= $lastFortniteTimestamp;
+	} catch (Exception $e) {
+		return false;
+	}
 })->first();
 
 $statusToColor = function(string $status): string {
@@ -225,7 +244,7 @@ $formatCurrency = function(float $price) use ($currencyPosition, $currencySymbol
                 @lang('COM_AKEEBASUBS_SUBSCRIPTIONS_ACTION_HISTORY_SHOW_HIDE')
             </button>
         </h4>
-        <div id="akeebasubs_my_subscriptions_level_{{ $level->slug }}" style="display: none;">
+        <div id="akeebasubs_my_subscriptions_level_{{ $level->slug }}">
         @foreach ($allSubs as $sub)
         <?php /** @var Subscriptions $sub */ ?>
             {{-- TRANSACTION DISPLAY --}}
@@ -238,10 +257,10 @@ $formatCurrency = function(float $price) use ($currencyPosition, $currencySymbol
                     </span>
 
                     <span class="akeebasubs-subscription-purchase-date">
-                        @if ((int)substr($lastSub->created_on, 0, 4) < 1)
+                        @if ((int)substr($sub->created_on, 0, 4) < 1)
                             @lang('COM_AKEEBASUBS_SUBSCRIPTIONS_INVALIDCREATIONDATE')
                         @else
-                            {{ \Akeeba\Subscriptions\Admin\Helper\Format::date($lastSub->created_on) }}
+                            {{ \Akeeba\Subscriptions\Admin\Helper\Format::date($sub->created_on) }}
                         @endif
                     </span>
 
@@ -281,8 +300,8 @@ $formatCurrency = function(float $price) use ($currencyPosition, $currencySymbol
                         <p>
                             @sprintf(
                             'COM_AKEEBASUBS_SUBSCRIPTIONS_PUBLISHDATES_EXPIRED_ALL',
-                            \Akeeba\Subscriptions\Admin\Helper\Format::date($lastSub->publish_up),
-                            \Akeeba\Subscriptions\Admin\Helper\Format::date($lastSub->publish_down)
+                            \Akeeba\Subscriptions\Admin\Helper\Format::date($sub->publish_up),
+                            \Akeeba\Subscriptions\Admin\Helper\Format::date($sub->publish_down)
                             )
                         </p>
                     {{-- Renewal / upgrade / downgrade --}}
@@ -290,8 +309,8 @@ $formatCurrency = function(float $price) use ($currencyPosition, $currencySymbol
                         <p>
                             @sprintf(
                             'COM_AKEEBASUBS_SUBSCRIPTIONS_PUBLISHDATES_RENEWAL_ALL',
-                            \Akeeba\Subscriptions\Admin\Helper\Format::date($lastSub->publish_up),
-                            \Akeeba\Subscriptions\Admin\Helper\Format::date($lastSub->publish_down)
+                            \Akeeba\Subscriptions\Admin\Helper\Format::date($sub->publish_up),
+                            \Akeeba\Subscriptions\Admin\Helper\Format::date($sub->publish_down)
                             )
                         </p>
                     {{-- Active --}}
@@ -299,8 +318,8 @@ $formatCurrency = function(float $price) use ($currencyPosition, $currencySymbol
                         <p>
                             @sprintf(
                             'COM_AKEEBASUBS_SUBSCRIPTIONS_PUBLISHDATES_ACTIVE_ALL',
-                            \Akeeba\Subscriptions\Admin\Helper\Format::date($lastSub->publish_up),
-                            \Akeeba\Subscriptions\Admin\Helper\Format::date($lastSub->publish_down)
+                            \Akeeba\Subscriptions\Admin\Helper\Format::date($sub->publish_up),
+                            \Akeeba\Subscriptions\Admin\Helper\Format::date($sub->publish_down)
                             )
                         </p>
                     @endif
@@ -332,7 +351,7 @@ $formatCurrency = function(float $price) use ($currencyPosition, $currencySymbol
                     </p>
 
                     {{-- RECEIPT / INVOICE --}}
-                    @if (!is_null($sub->invoice) || !empty($sub->receipt_url))
+                    @if (!empty($sub->akeebasubs_invoice_id) || !empty($sub->receipt_url))
                         <p>
                             @if (!empty($sub->receipt_url))
                                 <a class="akeeba-btn--grey--small"
@@ -343,7 +362,7 @@ $formatCurrency = function(float $price) use ($currencyPosition, $currencySymbol
                                 </a>
                             @endif
 
-                            @if (!is_null($sub->invoice))
+                            @if (!empty($sub->akeebasubs_invoice_id))
                                 <a class="akeeba-btn--small--grey--small"
                                    href="@route('index.php?option=com_akeebasubs&view=Invoice&task=read&id=' . $sub->getId() . '&tmpl=component')"
                                    target="_blank"
@@ -415,9 +434,9 @@ $formatCurrency = function(float $price) use ($currencyPosition, $currencySymbol
                 </span>
             @endif
             {{-- Created on --}}
-            {{ \Akeeba\Subscriptions\Admin\Helper\Format::date($lastSub->created_on) }}
-            {{ $lastSub->processor}}
-            {{ $lastSub->processor_key}}
+            {{ \Akeeba\Subscriptions\Admin\Helper\Format::date($sub->created_on) }}
+            {{ $sub->processor}}
+            {{ $sub->processor_key}}
         </li>
         -->
         @endforeach

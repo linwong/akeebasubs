@@ -35,14 +35,14 @@ class Com_AkeebasubsInstallerScript extends \FOF30\Utils\InstallScript
 	 *
 	 * @var   string
 	 */
-	protected $minimumPHPVersion = '7.2.0';
+	protected $minimumPHPVersion = '7.3.0';
 
 	/**
 	 * The minimum Joomla! version required to install this extension
 	 *
 	 * @var   string
 	 */
-	protected $minimumJoomlaVersion = '3.4.0';
+	protected $minimumJoomlaVersion = '3.9.0';
 
 	/**
 	 * Obsolete files and folders to remove from both paid and free releases. This is used when you refactor code and
@@ -120,7 +120,7 @@ class Com_AkeebasubsInstallerScript extends \FOF30\Utils\InstallScript
 			'cli/akeebasubs-expiration-notify.php',
 			'cli/akeebasubs-update.php',
 
-            // Moving to FEF
+			// Moving to FEF
 			'administrator/components/com_akeebasubs/View/eaccelerator.php',
 			'administrator/components/com_akeebasubs/View/errorhandler.php',
 			'administrator/components/com_akeebasubs/View/fef.php',
@@ -130,14 +130,15 @@ class Com_AkeebasubsInstallerScript extends \FOF30\Utils\InstallScript
 			'administrator/components/com_akeebasubs/View/Invoices/Form.php',
 			'administrator/components/com_akeebasubs/View/CreditNotes/Form.php',
 
-            // Akeeba Subscriptions 7 - Only support MoR integrations
+			// Akeeba Subscriptions 7 - Only support MoR integrations
 			'administrator/components/com_akeebasubs/Controller/Import.php',
+			'administrator/components/com_akeebasubs/Controller/Updates.php',
 			'administrator/components/com_akeebasubs/Controller/User.php',
 
-            'administrator/components/com_akeebasubs/Form/Field/APICouponLimits.php',
+			'administrator/components/com_akeebasubs/Form/Field/APICouponLimits.php',
 
-            'administrator/components/com_akeebasubs/Helper/EUVATInfo.php',
-            'administrator/components/com_akeebasubs/Helper/Forex.php',
+			'administrator/components/com_akeebasubs/Helper/EUVATInfo.php',
+			'administrator/components/com_akeebasubs/Helper/Forex.php',
 
 			'administrator/components/com_akeebasubs/Model/APICoupons.php',
 			'administrator/components/com_akeebasubs/Model/CreditNoteTemplates.php',
@@ -149,20 +150,21 @@ class Com_AkeebasubsInstallerScript extends \FOF30\Utils\InstallScript
 			'administrator/components/com_akeebasubs/Model/TaxRules.php',
 			'administrator/components/com_akeebasubs/Model/Users.php',
 
-            'administrator/components/com_akeebasubs/PluginAbstracts/AkpaymentsBase.php',
+			'administrator/components/com_akeebasubs/PluginAbstracts/AkpaymentsBase.php',
 
-            'administrator/components/com_akeebasubs/ViewTemplates/ControlPanel/wizard.blade.php',
-            'administrator/components/com_akeebasubs/ViewTemplates/Subscriptions/form_customparams.blade.php',
-            'administrator/components/com_akeebasubs/ViewTemplates/Common/EntryPaymentPlugins.php',
+			'administrator/components/com_akeebasubs/ViewTemplates/ControlPanel/wizard.blade.php',
+			'administrator/components/com_akeebasubs/ViewTemplates/ControlPanel/quickicons.blade.php',
+			'administrator/components/com_akeebasubs/ViewTemplates/Subscriptions/form_customparams.blade.php',
+			'administrator/components/com_akeebasubs/ViewTemplates/Common/EntryPaymentPlugins.php',
 
 			'components/com_akeebasubs/Controller/APICoupons.php',
 			'components/com_akeebasubs/Controller/TaxConfig.php',
 			'components/com_akeebasubs/Controller/UserInfo.php',
 
-            'components/com_akeebasubs/Model/APICoupons.php',
-            'components/com_akeebasubs/Model/InvoiceTemplates.php',
-            'components/com_akeebasubs/Model/LevelGroups.php',
-            'components/com_akeebasubs/Model/PaymentMethods.php',
+			'components/com_akeebasubs/Model/APICoupons.php',
+			'components/com_akeebasubs/Model/InvoiceTemplates.php',
+			'components/com_akeebasubs/Model/LevelGroups.php',
+			'components/com_akeebasubs/Model/PaymentMethods.php',
 			'components/com_akeebasubs/Model/States.php',
 			'components/com_akeebasubs/Model/Subscribe/Validation/Business.php',
 			'components/com_akeebasubs/Model/Subscribe/Validation/Country.php',
@@ -187,8 +189,8 @@ class Com_AkeebasubsInstallerScript extends \FOF30\Utils\InstallScript
 			'components/com_akeebasubs/View/Levels/tmpl/strappy.php',
 			'components/com_akeebasubs/View/Subscriptions/tmpl/default.php',
 
-            'components/com_akeebasubs/views/Levels/tmpl/awesome.xml',
-            'components/com_akeebasubs/views/Levels/tmpl/strappy.xml',
+			'components/com_akeebasubs/views/Levels/tmpl/awesome.xml',
+			'components/com_akeebasubs/views/Levels/tmpl/strappy.xml',
 
 			'media/com_akeebasubs/images/couponicons.png',
 			'media/com_akeebasubs/images/dollaricons.png',
@@ -197,6 +199,19 @@ class Com_AkeebasubsInstallerScript extends \FOF30\Utils\InstallScript
 			'media/com_akeebasubs/images/sort_desc.png',
 			'media/com_akeebasubs/images/subrefresh.png',
 			'media/com_akeebasubs/js/autosubmit.js',
+
+			// Replaced jqPlot with Charts.js
+			'media/com_akeebasubs/js/excanvas.min.js',
+			'media/com_akeebasubs/js/jqplot.barRenderer.min.js',
+			'media/com_akeebasubs/js/jqplot.canvasAxisLabelRenderer.min.js',
+			'media/com_akeebasubs/js/jqplot.canvasAxisTickRenderer.min.js',
+			'media/com_akeebasubs/js/jqplot.canvasTextRenderer.min.js',
+			'media/com_akeebasubs/js/jqplot.dateAxisRenderer.min.js',
+			'media/com_akeebasubs/js/jqplot.hermite.js',
+			'media/com_akeebasubs/js/jqplot.highlighter.min.js',
+			'media/com_akeebasubs/js/jqplot.json2.min.js',
+			'media/com_akeebasubs/js/jqplot.pieRenderer.min.js',
+			'media/com_akeebasubs/js/jquery.jqplot.min.js',
 		],
 		'folders' => [
 			'administrator/components/com_akeebasubs/commands',

@@ -20,8 +20,6 @@ $extensions = $model->getExtensions();
 $returnUrl = base64_encode('index.php?option=com_akeebasubs&view=Invoices');
 ?>
 
-@jhtml('behavior.modal', 'a.akeebaSubsModal')
-
 @extends('admin:com_akeebasubs/Common/browse')
 
 @section('browse-page-top')
@@ -115,7 +113,7 @@ $returnUrl = base64_encode('index.php?option=com_akeebasubs&view=Invoices');
             </td>
             <td>
                 @unless(is_null($row->subscription))
-                    @include('admin:com_akeebasubs/Common/ShowUser', ['item' => $row->subscription, 'field' => 'user_id', 'link_url' => 'index.php?option=com_akeebasubs&view=Users&task=edit&user_id=' . (int) $row->subscription->user_id])
+                    @include('admin:com_akeebasubs/Common/ShowUser', ['item' => $row->subscription, 'field' => 'user_id', 'link_url' => 'index.php?option=com_users&task=user.edit&id=' . (int) $row->subscription->user_id])
                 @endunless
             </td>
             <td>
@@ -138,7 +136,7 @@ $returnUrl = base64_encode('index.php?option=com_akeebasubs&view=Invoices');
             <td>
                 @if ($row->extension == 'akeebasubs')
                     <a href="@route('index.php?option=com_akeebasubs&view=Invoices&task=read&tmpl=component&id=' . $row->akeebasubs_subscription_id)"
-                        class="akeeba-btn--teal--small akeebaSubsModal" rel="{handler: 'iframe', size: {x: 800, y: 500}}"
+                        class="akeeba-btn--teal--small" target="_blank"
                         title="@lang('COM_AKEEBASUBS_INVOICES_ACTION_PREVIEW')">
                         <span class="akion-document-text"></span>
                     </a>

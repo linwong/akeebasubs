@@ -325,6 +325,12 @@ class Levels extends DataModel
 		// Do we have an image?
 		$this->assertNotEmpty($this->image, 'COM_AKEEBASUBS_LEVEL_ERR_IMAGE');
 
+		// Fix the product URL
+		if (empty($this->product_url))
+		{
+			$this->product_url = '';
+		}
+
 		// Check the fixed expiration date and make sure it's in the future
 		$nullDate = $this->getDbo()->getNullDate();
 
@@ -337,6 +343,10 @@ class Levels extends DataModel
 			{
 				$this->fixed_date = $nullDate;
 			}
+		}
+		else
+		{
+			$this->fixed_date = $nullDate;
 		}
 
 		// Is the duration less than a day and this is not a forever or a fixed date subscription?
@@ -357,11 +367,33 @@ class Levels extends DataModel
 			$this->assert($this->duration >= 1, 'COM_AKEEBASUBS_LEVEL_ERR_LENGTH');
 		}
 
+		// Sanitize Paddle parameters
+		foreach (['paddle_product_id', 'paddle_secret', 'paddle_plan_id', 'paddle_plan_secret'] as $field)
+		{
+			if ($this->getFieldValue($field) == '')
+			{
+				$this->setFieldValue($field, null);
+			}
+		}
+
 		// Disable upsell for recurring and forever subscriptions (it does not make sense!)
 		$isFixedDate = !empty($this->fixed_date) && !($this->fixed_date == $nullDate);
 		if ($this->forever || $isFixedDate)
 		{
 			$this->upsell = 'never';
+		}
+
+		// Sanitize booleans
+		foreach (['only_once', 'recurring', 'forever'] as $field)
+		{
+			$v = $this->getFieldValue($field);
+
+			if (empty($v))
+			{
+				$v = 0;
+			}
+
+			$this->setFieldValue($field, $v ? 1 : 0);
 		}
 	}
 

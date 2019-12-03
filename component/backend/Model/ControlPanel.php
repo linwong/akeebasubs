@@ -132,4 +132,37 @@ class ControlPanel extends Model
 
 		return $needsUpdate;
 	}
+
+	/**
+	 * Removes the update sites for this extension
+	 *
+	 * @since  7.0.1
+	 */
+	public function deleteUpdateSites()
+	{
+		/** @var \Akeeba\Subscriptions\Admin\Model\Updates $updatesModel */
+		$updatesModel = $this->container->factory->model('Updates')->tmpInstance();
+		$updatesModel->removeObsoleteUpdateSites();
+		$updateSiteIds = $updatesModel->getUpdateSiteIds();
+
+		if (!empty($updateSiteIds) && is_array($updateSiteIds))
+		{
+			$db                = $this->container->db;
+			$obsoleteIDsQuoted = array_map([$db, 'quote'], $updateSiteIds);
+
+			// Delete update sites
+			$query = $db->getQuery(true)
+				->delete('#__update_sites')
+				->where($db->qn('update_site_id') . ' IN (' . implode(',', $obsoleteIDsQuoted) . ')');
+			$db->setQuery($query)->execute();
+
+			// Delete update sites to extension ID records
+			$query = $db->getQuery(true)
+				->delete('#__update_sites_extensions')
+				->where($db->qn('update_site_id') . ' IN (' . implode(',', $obsoleteIDsQuoted) . ')');
+			$db->setQuery($query)->execute();
+		}
+
+		return $this;
+	}
 }

@@ -11,8 +11,6 @@ defined('_JEXEC') or die();
 
 /** @var  \Akeeba\Subscriptions\Admin\Model\Subscriptions $model */
 
-\JHtml::_('behavior.modal');
-
 $invoice = $model->invoice;
 $returnURL = 'index.php?option=com_akeebasubs&view=Subscriptions&task=edit&id=' . $model->akeebasubs_subscription_id;
 
@@ -28,9 +26,9 @@ $returnURL = 'index.php?option=com_akeebasubs&view=Subscriptions&task=edit&id=' 
         </a>
     </h5>
 
-    <a class="akeeba-btn--grey modal"
+    <a class="akeeba-btn--grey"
        href="@route('index.php?option=com_akeebasubs&view=Invoices&task=read&id=' . (int) $model->akeebasubs_subscription_id . '&tmpl=component')"
-       rel="{handler: 'iframe', size: {x: 800, y: 500}}">
+        target="_blank">
         <span class="akion-document-text"></span>
         @lang('COM_AKEEBASUBS_INVOICES_ACTION_PREVIEW')
     </a>

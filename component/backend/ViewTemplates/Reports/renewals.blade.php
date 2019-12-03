@@ -70,7 +70,7 @@ $renewalsOptions = [
                 @jhtml('FEFHelper.browse.id', ++$i, $row->getId())
             </td>
             <td>
-                @include('admin:com_akeebasubs/Common/ShowUser', ['item' => $row, 'field' => 'user_id', 'linkURL' => 'index.php?option=com_akeebasubs&view=Users&task=edit&id=[ITEM:USER_ID]'])
+                @include('admin:com_akeebasubs/Common/ShowUser', ['item' => $row, 'field' => 'user_id', 'linkURL' => 'index.php?option=com_users&task=user.edit&id=[ITEM:USER_ID]'])
             </td>
             <td>
                 @foreach(explode(',', $row->raw_subs) as $subID)

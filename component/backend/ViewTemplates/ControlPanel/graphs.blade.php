@@ -12,7 +12,6 @@ use \Akeeba\Subscriptions\Admin\Helper\Select;
 $graphDayFrom = gmdate('Y-m-d', time() - 30 * 24 * 3600);
 $graphDayTo = gmdate('Y-m-d', time());
 
-
 $js = <<< JS
 akeebasubs_cpanel_graph_from = "$graphDayFrom";
 
@@ -30,15 +29,7 @@ JS;
 ?>
 
 @section('graphs')
-
-    @css('media://com_akeebasubs/css/jquery.jqplot.min.css')
-    @js('media://com_akeebasubs/js/excanvas.min.js')
-    @js('media://com_akeebasubs/js/jquery.jqplot.min.js')
-    @js('media://com_akeebasubs/js/jqplot.highlighter.min.js')
-    @js('media://com_akeebasubs/js/jqplot.dateAxisRenderer.min.js')
-    @js('media://com_akeebasubs/js/jqplot.barRenderer.min.js')
-    @js('media://com_akeebasubs/js/jqplot.pieRenderer.min.js')
-    @js('media://com_akeebasubs/js/jqplot.hermite.js')
+    @js('media://com_akeebasubs/js/Chart.bundle.min.js')
     @js('media://com_akeebasubs/js/cpanelgraphs.js')
 
     <div class="akeeba-panel--info">
@@ -68,12 +59,13 @@ JS;
             </form>
         </div>
 
-        <div id="aksaleschart">
-            <img src="@media('media://com_akeebasubs/images/throbber.gif')" id="akthrobber" />
-            <p id="aksaleschart-nodata" style="display:none">
-                @lang('COM_AKEEBASUBS_DASHBOARD_STATS_NODATA')
-            </p>
-        </div>
+        <canvas id="aksaleschart"></canvas>
+
+        <img src="@media('media://com_akeebasubs/images/throbber.gif')" id="akthrobber" />
+
+        <p id="aksaleschart-nodata" style="display:none">
+            @lang('COM_AKEEBASUBS_DASHBOARD_STATS_NODATA')
+        </p>
 
         <div style="clear: both;">&nbsp;</div>
 
@@ -81,12 +73,13 @@ JS;
             @lang('COM_AKEEBASUBS_DASHBOARD_LEVELSTATS')
         </h3>
 
-        <div id="aklevelschart">
-            <img src="@media('media://com_akeebasubs/images/throbber.gif')" id="akthrobber2" />
-            <p id="aklevelschart-nodata" style="display:none">
-                @lang('COM_AKEEBASUBS_DASHBOARD_STATS_NODATA')
-            </p>
-        </div>
+        <canvas id="aklevelschart"></canvas>
+
+        <img src="@media('media://com_akeebasubs/images/throbber.gif')" id="akthrobber2" />
+
+        <p id="aklevelschart-nodata" style="display:none">
+            @lang('COM_AKEEBASUBS_DASHBOARD_STATS_NODATA')
+        </p>
 
     </div>
     @inlineJs($js)

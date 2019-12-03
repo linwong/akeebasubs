@@ -5,19 +5,44 @@
  * @license   GNU General Public License version 3, or later
  */
 
-// Define ourselves as a parent file
-define('_JEXEC', 1);
-define('JDEBUG', 1);
-
 use Akeeba\Subscriptions\Site\Model\Subscriptions;
 use FOF30\Container\Container;
 use FOF30\Date\Date;
-use Joomla\CMS\Application\CliApplication;
 use Joomla\CMS\Crypt\Crypt;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Session\Session;
 use Joomla\CMS\Uri\Uri;
 use Joomla\Input\Cli;
+
+// Enable Joomla's debug mode
+define('JDEBUG', 1);
+
+// Boilerplate -- START
+define('_JEXEC', 1);
+
+foreach ([__DIR__, getcwd()] as $curdir)
+{
+	if (file_exists($curdir . '/defines.php'))
+	{
+		define('JPATH_BASE', realpath($curdir . '/..'));
+		require_once $curdir . '/defines.php';
+
+		break;
+	}
+
+	if (file_exists($curdir . '/../includes/defines.php'))
+	{
+		define('JPATH_BASE', realpath($curdir . '/..'));
+		require_once $curdir . '/../includes/defines.php';
+
+		break;
+	}
+}
+
+defined('JPATH_LIBRARIES') || die ('This script must be placed in or run from the cli folder of your site.');
+
+require_once JPATH_LIBRARIES . '/fof30/Cli/Application.php';
+// Boilerplate -- END
 
 /**
  * A simplistic exception handler
@@ -58,186 +83,12 @@ END;
 
 set_exception_handler('akeebasubsCliExceptionHandler');
 
-// Load system defines
-$cwd = getcwd();
-
-if (file_exists(__DIR__ . '/defines.php'))
-{
-	include_once __DIR__ . '/defines.php';
-}
-elseif (file_exists($cwd . '/defines.php'))
-{
-	include_once $cwd . '/defines.php';
-}
-else
-{
-	$path = rtrim(__DIR__, DIRECTORY_SEPARATOR);
-	$rpos = strrpos($path, DIRECTORY_SEPARATOR);
-	$path = substr($path, 0, $rpos);
-
-	if (!file_exists($path . '/index.php'))
-	{
-		$path = rtrim($cwd, DIRECTORY_SEPARATOR);
-		$rpos = strrpos($path, DIRECTORY_SEPARATOR);
-		$path = substr($path, 0, $rpos);
-	}
-
-	define('JPATH_BASE', $path);
-	include_once JPATH_BASE . '/includes/defines.php';
-}
-
-// Load the rest of the framework include files
-require_once JPATH_LIBRARIES . '/import.legacy.php';
-require_once JPATH_LIBRARIES . '/cms.php';
-
-// Load the configuration.php file explicitly
-JFactory::getConfig(JPATH_CONFIGURATION . '/configuration.php');
-
-/**
- * Dummy session handler for CLI applications
- *
- * @since       7.0.0
- */
-class SessionHandlerCli implements JSessionHandlerInterface
-{
-	private $started = false;
-
-	private $id = null;
-
-	private $sessionName = 'cli';
-
-	/**
-	 * Starts the session.
-	 *
-	 * @return  boolean  True if started.
-	 *
-	 * @since   3.5
-	 * @throws  RuntimeException If something goes wrong starting the session.
-	 */
-	public function start()
-	{
-		$this->started = true;
-		$this->id = \Joomla\CMS\User\UserHelper::genRandomPassword(32);
-	}
-
-	/**
-	 * Checks if the session is started.
-	 *
-	 * @return  boolean  True if started, false otherwise.
-	 *
-	 * @since   3.5
-	 */
-	public function isStarted()
-	{
-		return $this->started;
-	}
-
-	/**
-	 * Returns the session ID
-	 *
-	 * @return  string  The session ID
-	 *
-	 * @since   3.5
-	 */
-	public function getId()
-	{
-		return $this->id;
-	}
-
-	/**
-	 * Sets the session ID
-	 *
-	 * @param   string $id The session ID
-	 *
-	 * @return  void
-	 *
-	 * @since   3.5
-	 */
-	public function setId($id)
-	{
-		$this->id = $id;
-	}
-
-	/**
-	 * Returns the session name
-	 *
-	 * @return  mixed  The session name.
-	 *
-	 * @since   3.5
-	 */
-	public function getName()
-	{
-		return $this->sessionName;
-	}
-
-	/**
-	 * Sets the session name
-	 *
-	 * @param   string $name The name of the session
-	 *
-	 * @return  void
-	 *
-	 * @since   3.5
-	 */
-	public function setName($name)
-	{
-		$this->sessionName = $name;
-	}
-
-	/**
-	 * Regenerates ID that represents this storage.
-	 *
-	 * Note regenerate+destroy should not clear the session data in memory only delete the session data from persistent storage.
-	 *
-	 * @param   boolean $destroy    Destroy session when regenerating?
-	 * @param   integer $lifetime   Sets the cookie lifetime for the session cookie. A null value will leave the system settings unchanged,
-	 *                              0 sets the cookie to expire with browser session. Time is in seconds, and is not a Unix timestamp.
-	 *
-	 * @return  boolean  True if session regenerated, false if error
-	 *
-	 * @since   3.5
-	 */
-	public function regenerate($destroy = false, $lifetime = null)
-	{
-		$this->id = \Joomla\CMS\User\UserHelper::genRandomPassword(32);
-	}
-
-	/**
-	 * Force the session to be saved and closed.
-	 *
-	 * This method must invoke session_write_close() unless this interface is used for a storage object design for unit or functional testing where
-	 * a real PHP session would interfere with testing, in which case it should actually persist the session data if required.
-	 *
-	 * @return  void
-	 *
-	 * @see     session_write_close()
-	 * @since   3.5
-	 * @throws  RuntimeException  If the session is saved without being started, or if the session is already closed.
-	 */
-	public function save()
-	{
-		$this->started = false;
-	}
-
-	/**
-	 * Clear all session data in memory.
-	 *
-	 * @return  void
-	 *
-	 * @since   3.5
-	 */
-	public function clear()
-	{
-		$this->started = false;
-	}
-}
-
 /**
  * A debug script which produces dummy callbacks to test our callbacks integration.
  *
  * @since       7.0.0
  */
-class AkeebasubsCallbackDebug extends CliApplication
+class AkeebasubsCallbackDebug extends FOFApplicationCLI
 {
 	protected function doExecute()
 	{
@@ -928,4 +779,4 @@ TEXT;
 	}
 }
 
-CliApplication::getInstance('AkeebasubsCallbackDebug')->execute();
+FOFApplicationCLI::getInstance('AkeebasubsCallbackDebug')->execute();

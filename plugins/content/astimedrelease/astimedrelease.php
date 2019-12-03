@@ -11,6 +11,7 @@ use FOF30\Container\Container;
 use Akeeba\Subscriptions\Site\Model\Levels;
 use Akeeba\Subscriptions\Site\Model\Subscriptions;
 use FOF30\Date\Date;
+use Joomla\String\StringHelper;
 
 class plgContentAstimedrelease extends JPlugin
 {
@@ -73,19 +74,19 @@ class plgContentAstimedrelease extends JPlugin
 
 		$text = is_object($row) ? $row->text : $row;
 
-		if (JString::strpos($row->text, 'astimedrelease') !== false)
+		if (StringHelper::strpos($row->text, 'astimedrelease') !== false)
 		{
 			$regex = "#{astimedrelease(.*?)}(.*?){/astimedrelease}#s";
 			$text  = preg_replace_callback($regex, array('self', 'process'), $text);
 		}
 
-		if (JString::strpos($row->text, 'asdayselapsed') !== false)
+		if (StringHelper::strpos($row->text, 'asdayselapsed') !== false)
 		{
 			$regex = "#{asdayselapsed(.*?)}#s";
 			$text  = preg_replace_callback($regex, array('self', 'processElapsed'), $text);
 		}
 
-		if (JString::strpos($row->text, 'asdaysremaining') !== false)
+		if (StringHelper::strpos($row->text, 'asdaysremaining') !== false)
 		{
 			$regex = "#{asdaysremaining(.*?)}#s";
 			$text  = preg_replace_callback($regex, array('self', 'processRemaining'), $text);

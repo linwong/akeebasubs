@@ -10,6 +10,7 @@ defined('_JEXEC') or die();
 use FOF30\Container\Container;
 use Akeeba\Subscriptions\Admin\Model\Levels;
 use Joomla\CMS\Plugin\CMSPlugin;
+use Joomla\String\StringHelper;
 
 class plgContentAslink extends CMSPlugin
 {
@@ -54,7 +55,7 @@ class plgContentAslink extends CMSPlugin
 		}
 
 		// Check whether the plugin should process or not
-		if (JString::strpos($article->text, 'aslink') === false)
+		if (StringHelper::strpos($article->text, 'aslink') === false)
 		{
 			return true;
 		}

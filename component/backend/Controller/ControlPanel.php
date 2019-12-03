@@ -23,7 +23,7 @@ class ControlPanel extends Controller
 	{
 		parent::__construct($container, $config);
 
-		$this->predefinedTaskList = ['main', 'updateinfo', 'updategeoip'];
+		$this->predefinedTaskList = ['main', 'updategeoip'];
 	}
 
 	/**
@@ -35,56 +35,8 @@ class ControlPanel extends Controller
 		$model = $this->getModel();
 		$model
 			->checkAndFixDatabase()
-			->saveMagicVariables();
-
-		/** @var \Akeeba\Subscriptions\Admin\Model\Updates $updatesModel */
-		$updatesModel = $this->getModel('Updates');
-		$updatesModel->refreshUpdateSite();
-	}
-
-	/**
-	 * Force reload the update information
-	 */
-	public function updateinfo()
-	{
-		/** @var Updates $updateModel */
-		$updateModel = $this->getModel('Updates');
-		$updateInfo = (object)$updateModel->getUpdates();
-
-		$result = '';
-
-		if ($updateInfo->hasUpdate)
-		{
-			$strings = array(
-				'header'		=> JText::sprintf('COM_AKEEBASUBS_CPANEL_MSG_UPDATEFOUND', $updateInfo->version),
-				'button'		=> JText::sprintf('COM_AKEEBASUBS_CPANEL_MSG_UPDATENOW', $updateInfo->version),
-				'infourl'		=> $updateInfo->infoURL,
-				'infolbl'		=> JText::_('COM_AKEEBASUBS_CPANEL_MSG_MOREINFO'),
-			);
-
-			$result = <<<ENDRESULT
-	<div class="akeeba-block--warning">
-		<h3>
-			{$strings['header']}
-		</h3>
-		<p>
-			<a href="index.php?option=com_installer&view=update" class="akeeba-btn--primary">
-				<span class="akion-refresh"></span>
-				{$strings['button']}
-			</a>
-			<a href="{$strings['infourl']}" target="_blank" class="akeeba-btn--small--ghost">
-				<span class="akion-information-circled"></span>
-				{$strings['infolbl']}
-			</a>
-		</p>
-	</div>
-ENDRESULT;
-		}
-
-		echo '###' . $result . '###';
-
-		// Cut the execution short
-		$this->container->platform->closeApplication();
+			->saveMagicVariables()
+			->deleteUpdateSites();
 	}
 
 	/**

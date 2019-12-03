@@ -19,8 +19,6 @@ $nullDate = $this->container->db->getNullDate();
 $invoiceModel = $this->getModel()->getContainer()->factory->model('Invoices')->tmpInstance();
 ?>
 
-@jhtml('behavior.modal', 'a.akeebaSubsModal')
-
 @extends('admin:com_akeebasubs/Common/browse')
 
 @section('browse-filters')
@@ -77,7 +75,7 @@ $invoiceModel = $this->getModel()->getContainer()->factory->model('Invoices')->t
             </td>
             <td>
                 @unless(is_null($row->invoice) || is_null($row->invoice->subscription))
-                    @include('admin:com_akeebasubs/Common/ShowUser', ['item' => $row->invoice->subscription, 'field' => 'user_id', 'link_url' => 'index.php?option=com_akeebasubs&view=Users&task=edit&user_id=' . (int) $row->invoice->subscription->user_id])
+                    @include('admin:com_akeebasubs/Common/ShowUser', ['item' => $row->invoice->subscription, 'field' => 'user_id', 'link_url' => 'index.php?option=com_users&task=user.edit&id=' . (int) $row->invoice->subscription->user_id])
                 @endunless
             </td>
             <td>
@@ -96,7 +94,7 @@ $invoiceModel = $this->getModel()->getContainer()->factory->model('Invoices')->t
             </td>
             <td>
                 <a href="@route('index.php?option=com_akeebasubs&view=CreditNotes&task=read&tmpl=component&id=' . $row->akeebasubs_invoice_id)"
-                   class="akeeba-btn--teal--small akeebaSubsModal" rel="{handler: 'iframe', size: {x: 800, y: 500}}"
+                   class="akeeba-btn--teal--small" target="_blank"
                    title="@lang('COM_AKEEBASUBS_INVOICES_ACTION_PREVIEW')">
                     <span class="akion-document-text"></span>
                 </a>

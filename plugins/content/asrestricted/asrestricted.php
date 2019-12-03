@@ -9,6 +9,7 @@ use FOF30\Container\Container;
 use Akeeba\Subscriptions\Admin\Model\Levels;
 use Akeeba\Subscriptions\Admin\Model\Subscriptions;
 use FOF30\Date\Date;
+use Joomla\String\StringHelper;
 
 class plgContentAsrestricted extends JPlugin
 {
@@ -55,7 +56,7 @@ class plgContentAsrestricted extends JPlugin
 		if (is_object($row))
 		{
 			// Check whether the plugin should process or not
-			if (JString::strpos($row->text, 'akeebasubs') === false)
+			if (StringHelper::strpos($row->text, 'akeebasubs') === false)
 			{
 				return true;
 			}
@@ -66,7 +67,7 @@ class plgContentAsrestricted extends JPlugin
 		}
 		else
 		{
-			if (JString::strpos($row, 'akeebasubs') === false)
+			if (StringHelper::strpos($row, 'akeebasubs') === false)
 			{
 				return true;
 			}

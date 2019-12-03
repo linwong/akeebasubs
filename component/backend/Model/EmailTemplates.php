@@ -56,6 +56,14 @@ use FOF30\Model\DataModel;
 		$this->addBehaviour('Filters');
 	}
 
+	protected function onBeforeCheck()
+	{
+		if (empty($this->subscription_level_id))
+		{
+			$this->subscription_level_id = null;
+		}
+	}
+
 	/**
 	 * Unpublish the newly copied item
 	 *

@@ -319,20 +319,6 @@ class Toolbar extends \FOF30\Toolbar\Toolbar
 			$class = 'default';
 		}
 
-		if (isset($options['modal']))
-		{
-			\JHtml::_('behavior.modal');
-			$a_class .= ' modal';
-			$rel = "'handler':'iframe'";
-			if (is_array($options['modal']))
-			{
-				if (isset($options['modal']['size']['x']) && isset($options['modal']['size']['y']))
-				{
-					$rel .= ", 'size' : {'x' : " . $options['modal']['size']['x'] . ", 'y' : " . $options['modal']['size']['y'] . "}";
-				}
-			}
-		}
-
 		$html = '<a id="' . $id . '" class="' . $a_class . '" alt="' . $text . '"';
 
 		if ($rel)

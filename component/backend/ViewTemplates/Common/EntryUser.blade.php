@@ -3,9 +3,13 @@
  * @package   AkeebaSubs
  * @copyright Copyright (c)2010-2019 Nicholas K. Dionysopoulos / Akeeba Ltd
  * @license   GNU General Public License version 3, or later
- *
+ */
+
+defined('_JEXEC') or die;
+
+/**
  * User entry field, allowing selection of a user from a modal dialog
- * Use it $this->loadAnyTemplate('admin:com_akeebasubs/Common/EntryUser', $params)
+ * Use it $this->loadAnyTemplate('admin:com_ats/Common/EntryUser', $params)
  *
  * $params is an array defining the following keys (they are expanded into local scope vars automatically):
  *
@@ -77,4 +81,13 @@ $url = 'index.php' . $uri->toString(['query']);
 	'onchange' => $onchange,
 	])
 
+	<script type="text/javascript">
+		jQuery(document).ready(function () {
+			setTimeout(function() {
+				var elModal     = document.getElementById("userModal_{{{ $field }}}");
+				var elContainer = document.getElementById("akeeba-renderer-fef");
+				elContainer.parentElement.appendChild(elModal);
+			}, 250);
+		})
+	</script>
 @endif

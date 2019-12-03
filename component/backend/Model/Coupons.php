@@ -140,7 +140,7 @@ class Coupons extends DataModel
 		$this->coupon = strtoupper($this->coupon);
 
 		// Normalise the publish up / down dates
-		$this->publish_up = $this->normaliseDate($this->publish_up, '2001-01-01 00:00:00');
+		$this->publish_up   = $this->normaliseDate($this->publish_up, '2001-01-01 00:00:00');
 		$this->publish_down = $this->normaliseDate($this->publish_down, '2038-01-18 00:00:00');
 		list($this->publish_up, $this->publish_down) = $this->sortPublishDates($this->publish_up, $this->publish_down);
 
@@ -158,6 +158,10 @@ class Coupons extends DataModel
 				}
 			}
 		}
+		else
+		{
+			$this->user = null;
+		}
 
 		// Check the hits limit
 		if ($this->hitslimit <= 0)
@@ -165,13 +169,20 @@ class Coupons extends DataModel
 			$this->hitslimit = 0;
 		}
 
+		if ($this->userhits <= 0)
+		{
+			$this->userhits = 0;
+		}
+
 		// Check the type
-		if (!in_array($this->type, array('value', 'percent', 'lastpercent')))
+		if (!in_array($this->type, ['value', 'percent', 'lastpercent']))
 		{
 			$this->type = 'value';
 		}
 
 		// Check value
+		$this->value = (float)($this->value);
+
 		if ($this->value < 0)
 		{
 			throw new \RuntimeException(JText::_('COM_AKEEBASUBS_COUPON_ERR_VALUE'));
@@ -180,6 +191,20 @@ class Coupons extends DataModel
 		if (($this->value > 100) && ($this->type == 'percent'))
 		{
 			$this->value = 100;
+		}
+
+		// Recurring access
+		if (empty($this->recurring_access))
+		{
+			$this->recurring_access = 0;
+		}
+
+		$this->recurring_access = $this->recurring_access ? 1 : 0;
+
+		// Hits
+		if (empty($this->hits))
+		{
+			$this->hits = 0;
 		}
 
 		return $this;

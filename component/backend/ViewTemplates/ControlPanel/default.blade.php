@@ -22,8 +22,6 @@ immediately. Alternatively I could wrap this in a @section/@show block or even @
 render it. --}}
 @yield('phpVersionWarning', '')
 
-<div id="updateNotice"></div>
-
 @yield('geoip', '')
 
 <div class="akeeba-container--50-50">
@@ -34,9 +32,6 @@ render it. --}}
         @yield('stats', '')
 
         @modules('akeebasubscriptionsstats')
-
-        @include('admin:com_akeebasubs/ControlPanel/quickicons')
-        @yield('quickicons', '')
     </div>
 </div>
 
@@ -46,23 +41,3 @@ render it. --}}
         @yield('footer')
     </div>
 </div>
-
-<script type="text/javascript">
-    (function($) {
-        $(document).ready(function(){
-            $.ajax('index.php?option=com_akeebasubs&view=ControlPanel&task=updateinfo&tmpl=component', {
-                success: function(msg, textStatus, jqXHR)
-                {
-                    // Get rid of junk before and after data
-                    var match = msg.match(/###([\s\S]*?)###/);
-                    data = match[1];
-
-                    if (data.length)
-                    {
-                        $('#updateNotice').html(data);
-                    }
-                }
-            })
-        });
-    })(akeeba.jQuery);
-</script>

@@ -166,6 +166,8 @@ class SubscriptionsForStats extends Subscriptions
 			$this->addKnownField('date', $db->getNullDate(), 'datetime');
 			$this->addKnownField('net', 0.0, 'float');
 			$this->addKnownField('subs', 0, 'integer');
+
+			$query->order('date ASC');
 		}
 		elseif ($state->groupbyweek == 1)
 		{

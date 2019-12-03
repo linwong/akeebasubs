@@ -72,6 +72,11 @@ class EmailTemplate extends DataController
 
 		$mailer = Email::getPreloadedMailer($sub, 'plg_akeebasubs_' . $template->key);
 
+		if (is_null($mailer))
+		{
+			return;
+		}
+
 		$mailer->addRecipient($this->container->platform->getUser()->email);
 
 		if ($mailer->Send())

@@ -108,7 +108,7 @@ class CustomCheckout
 			 * is due to Paddle's web UI always setting the initial price to 0.00 when you edit a subscription plan,
 			 * i.e. leaving the value empty always results in a zero initial payment.
 			 */
-			if (is_null($initial_price) && ($initial_price < 0.01))
+			if (is_null($initial_price) || ($initial_price < 0.01))
 			{
 				unset($fields['prices']);
 			}
@@ -125,7 +125,7 @@ class CustomCheckout
 			/**
 			 * If we have a trial_days override we need to pass that along to Paddle.
 			 */
-			if (!is_null($trial_days))
+			if (!is_null($trial_days) && ($trial_days > 0))
 			{
 				$fields['trial_days'] = $trial_days;
 			}

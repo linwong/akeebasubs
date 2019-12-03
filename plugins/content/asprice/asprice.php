@@ -7,15 +7,11 @@
 
 defined('_JEXEC') or die();
 
-use FOF30\Container\Container;
 use Akeeba\Subscriptions\Admin\Model\Levels;
-use FOF30\Utils\Ip;
-use Joomla\CMS\Cache\Controller\CallbackController;
+use FOF30\Container\Container;
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Crypt\Crypt;
-use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
-use Joomla\CMS\Http\HttpFactory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Plugin\CMSPlugin;
 use Joomla\String\StringHelper;
@@ -53,6 +49,9 @@ class plgContentAsprice extends CMSPlugin
 	 * @var   array
 	 */
 	protected static $prices = null;
+
+	/** @var bool Should I localise prices? Mirrors localisePrice component option setting. */
+	protected static $localisePrices;
 
 	/**
 	 * Should this plugin be allowed to run? True if FOF can be loaded and the Akeeba Subscriptions component is enabled
@@ -314,7 +313,7 @@ class plgContentAsprice extends CMSPlugin
 	{
 		static $loadedJs = false;
 
-		// Intialization
+		// Initialization
 		$ret = [
 			'oneoff'    => self::getPriceFromLevel($levelId),
 			'recurring' => '',
@@ -330,7 +329,7 @@ class plgContentAsprice extends CMSPlugin
 		$plan_id       = $productIDInfo['plan_id'];
 
 		// Load the Paddle JS if necessary
-		if ((!empty($product_id) || !empty($plan_id)) && !$loadedJs)
+		if (((!empty($product_id) && self::$localisePrices) || !empty($plan_id)) && !$loadedJs)
 		{
 			// Make sure jQuery is actually loaded
 			HTMLHelper::_('jquery.framework');
@@ -364,7 +363,7 @@ JS;
 		}
 
 		// Add localised one-off pricing
-		if (!is_null($product_id))
+		if (!is_null($product_id) && self::$localisePrices)
 		{
 			$htmlId              = 'akeebasubs-plg-price-' . $product_id . '-' . self::uuid_v4();
 			$ret['js']['oneoff'] = <<< JS
@@ -411,6 +410,12 @@ HTML;
 		if (!$this->enabled)
 		{
 			return true;
+		}
+
+		if (is_null(self::$localisePrices))
+		{
+			$container            = Container::getInstance('com_akeebasubs');
+			self::$localisePrices = $container->params->get('localisePrice', 1) == 1;
 		}
 
 		$accceptableActions = [

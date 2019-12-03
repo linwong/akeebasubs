@@ -74,4 +74,24 @@ class Relations extends DataModel
 
 		$this->fieldsSkipChecks = ['ordering'];
 	}
+
+	protected function onBeforeCheck()
+	{
+		foreach ([
+			'source_level_id', 'target_level_id', 'low_threshold', 'low_amount', 'high_threshold', 'high_amount',
+			'flex_amount', 'flex_period', 'combine'
+		         ] as $field) {
+			$v = $this->getFieldValue($field);
+
+			if (empty($v))
+			{
+				$this->setFieldValue($field, 0);
+			}
+		}
+
+		if ($this->amount <= 0.001)
+		{
+			$this->amount = 0.0;
+		}
+	}
 }

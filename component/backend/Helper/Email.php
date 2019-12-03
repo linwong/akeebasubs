@@ -10,15 +10,12 @@ namespace Akeeba\Subscriptions\Admin\Helper;
 use Akeeba\Subscriptions\Admin\Model\EmailTemplates;
 use Akeeba\Subscriptions\Admin\Model\Subscriptions;
 use FOF30\Container\Container;
-use FOF30\Model\DataModel;
 use JFactory;
 use JFile;
 use JHtml;
-use JLoader;
-use JPluginHelper;
-use JText;
-use JUser;
 use Joomla\Registry\Registry as JRegistry;
+use JPluginHelper;
+use JUser;
 
 defined('_JEXEC') or die;
 
@@ -161,49 +158,42 @@ abstract class Email
 	}
 
 	/**
-	 * Loads an email template from the database or, if it doesn't exist, from
-	 * the language file.
+	 * Loads an email template from the database.
 	 *
 	 * @param   string   $key    The language key, in the form PLG_LOCATION_PLUGINNAME_TYPE
 	 * @param   integer  $level  The subscription level we're interested in
 	 * @param   JUser    $user   The user whose preferred language will be loaded
 	 *
-	 * @return  array  isHTML: If it's HTML override from the db; text: The unprocessed translation string
+	 * @return  array  Returns [subject, body]
 	 */
 	private static function loadEmailTemplate($key, $level = null, $user = null)
 	{
-		static $loadedLanguagesForExtensions = array();
-
 		if (is_null($user))
 		{
 			$user = self::getContainer()->platform->getUser();
 		}
 
 		// Parse the key
-		$key      = strtolower($key);
-		$keyParts = explode('_', $key, 4);
-
-		$extension = $keyParts[0] . '_' . $keyParts[1] . '_' . $keyParts[2];
-		$keyInDatabase     = $keyParts[2] . '_' . $keyParts[3];
+		$key           = strtolower($key);
+		$keyParts      = explode('_', $key, 4);
+		$keyInDatabase = $keyParts[2] . '_' . $keyParts[3];
 
 		// Initialise
 		$templateText = '';
 		$subject      = '';
-		$loadLanguage = null;
-		$isHTML       = false;
 
 		// Look for desired languages
 		$jLang     = JFactory::getLanguage();
 		$userLang  = $user->getParam('language', '');
-		$languages = array(
+		$languages = [
 			$userLang,
 			$jLang->getTag(),
 			$jLang->getDefault(),
 			'en-GB',
-			'*'
-		);
+			'*',
+		];
 
-		// Look for an override in the database
+		// Find an email template in the database
 		/** @var EmailTemplates $templatesModel */
 		$templatesModel = Container::getInstance('com_akeebasubs')->factory
 			->model('EmailTemplates')->tmpInstance();
@@ -262,54 +252,27 @@ abstract class Email
 
 				if ($score > $preferredScore)
 				{
-					$loadLanguage   = $myLang;
 					$subject        = $template->subject;
 					$templateText   = $template->body;
 					$preferredScore = $score;
-
-					$isHTML = true;
 				}
 			}
 		}
 
-		// If no match is found in the database (or if this is the Core release)
-		// we fall back to the legacy method of using plain text emails and
-		// translation strings.
-		if (!$isHTML)
+		if (empty($templateText))
 		{
-			$isHTML = false;
-
-			if (!array_key_exists($extension, $loadedLanguagesForExtensions))
-			{
-				self::loadLanguageOverrides($extension, $user);
-			}
-
-			$subjectKey = $extension . '_HEAD_' . $keyParts[3];
-			$subject    = JText::_($subjectKey);
-
-			if ($subject == $subjectKey)
-			{
-				$subjectKey = $extension . '_SUBJECT_' . $keyParts[3];
-				$subject    = JText::_($subjectKey);
-			}
-
-			$templateTextKey = $extension . '_BODY_' . $keyParts[3];
-			$templateText    = JText::_($templateTextKey);
-
-			$loadLanguage = '';
+			return ['' ,''];
 		}
 
-		if ($isHTML)
+		// Because SpamAssassin demands there is a body and surrounding html tag even though it's not necessary.
+		if (strpos($templateText, '<body') == false)
 		{
-			// Because SpamAssassin demands there is a body and surrounding html tag even though it's not necessary.
-			if (strpos($templateText, '<body') == false)
-			{
-				$templateText = '<body>' . $templateText . '</body>';
-			}
+			$templateText = '<body>' . $templateText . '</body>';
+		}
 
-			if (strpos($templateText, '<html') == false)
-			{
-				$templateText = <<< HTML
+		if (strpos($templateText, '<html') == false)
+		{
+			$templateText = <<< HTML
 <html>
 <head>
 <title>{$subject}</title>
@@ -318,10 +281,9 @@ $templateText
 </html>
 HTML;
 
-			}
 		}
 
-		return array($isHTML, $subject, $templateText, $loadLanguage);
+		return [$subject, $templateText];
 	}
 
 	/**
@@ -352,23 +314,23 @@ HTML;
 	 * @param   string         $key     The email key, in the form PLG_LOCATION_PLUGINNAME_TYPE
 	 * @param   array          $extras  Any optional substitution strings you want to introduce
 	 *
-	 * @return  \JMail|boolean False if something bad happened, the PHPMailer instance in any other case
+	 * @return  \JMail|null Null if something bad happened (e.g. template not found), the PHPMailer instance in any other case
 	 */
 	public static function getPreloadedMailer(Subscriptions $sub, $key, array $extras = array())
 	{
 		// Load the template
-		list($isHTML, $subject, $templateText, $loadLanguage) = self::loadEmailTemplate($key, $sub->akeebasubs_level_id, self::getContainer()->platform->getUser($sub->user_id));
+		list($subject, $templateText) = self::loadEmailTemplate($key, $sub->akeebasubs_level_id, self::getContainer()->platform->getUser($sub->user_id));
 
 		if (empty($subject))
 		{
-			return false;
+			return null;
 		}
 
 		$templateText = Message::processSubscriptionTags($templateText, $sub, $extras);
 		$subject      = Message::processSubscriptionTags($subject, $sub, $extras);
 
 		// Get the mailer
-		$mailer = self::getMailer($isHTML);
+		$mailer = self::getMailer(true);
 		$mailer->setSubject($subject);
 
 		// Include inline images

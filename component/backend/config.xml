@@ -119,13 +119,6 @@
 			<option value="64">COM_AKEEBASUBS_CONFIG_FRONTEND_SUMMARYIMAGES_OPT_MEDIUMIMAGE</option>
 			<option value="128">COM_AKEEBASUBS_CONFIG_FRONTEND_SUMMARYIMAGES_OPT_LARGEIMAGE</option>
 		</field>
-		
-		<field name="apply_joomla_password_requirements" type="radio" class="switcher btn-group" default="0"
-			   label="COM_AKEEBASUBS_CONFIG_FRONTEND_APPLY_JOOMLA_PASSWORD_REQUIREMENTS_LABEL"
-			   description="COM_AKEEBASUBS_CONFIG_FRONTEND_APPLY_JOOMLA_PASSWORD_REQUIREMENTS_DESC">
-			<option value="0">JNo</option>
-			<option value="1">JYes</option>
-		</field>
 
 		<field name="tos_url" type="text"
 			   default="tos.html"

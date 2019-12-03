@@ -169,7 +169,7 @@ class Subscriptions extends DataModel
 
 		if (!$this->getState('_dontCheckPaymentID', false))
 		{
-			$this->assertNotEmpty($this->processor, 'COM_AKEEBASUBS_SUBSCRIPTION_ERR_PROCESSOR_KEY');
+			//$this->assertNotEmpty($this->processor_key, 'COM_AKEEBASUBS_SUBSCRIPTION_ERR_PROCESSOR_KEY');
 		}
 
 		if (!in_array($this->payment_method, ['apple-pay', 'card', 'free', 'paypal', 'wire-transfer', 'unknown']))
@@ -180,6 +180,41 @@ class Subscriptions extends DataModel
 		if (!in_array($this->cancellation_reason, ['refund', 'risk', 'past_due', 'user', 'upgrade', 'tos', 'other']))
 		{
 			$this->payment_method = 'other';
+		}
+
+		foreach ([
+			         'net_amount', 'net_amount', 'gross_amount', 'tax_percent', 'fee_amount', 'prediscount_amount',
+			         'discount_amount', 'contact_flag'
+		         ] as $field)
+		{
+			$v = $this->getFieldValue($field);
+
+			if (empty($v) || ($v <= 0))
+			{
+				$this->setFieldValue($field, 0);
+			}
+		}
+
+		foreach (['akeebasubs_coupon_id', 'akeebasubs_upgrade_id', 'akeebasubs_invoice_id'] as $field)
+		{
+			$v = $this->getFieldValue($field);
+
+			if (empty($v))
+			{
+				$this->setFieldValue($field, null);
+			}
+		}
+
+		$nullDate = $this->getDbo()->getNullDate();
+
+		foreach (['first_contact', 'second_contact', 'after_contact'] as $field)
+		{
+			$v = $this->getFieldValue($field);
+
+			if (empty($v) || ($v = $nullDate))
+			{
+				$this->setFieldValue($field, $nullDate);
+			}
 		}
 
 		// If the _noemail state variable is set we have to modify contact_flag
